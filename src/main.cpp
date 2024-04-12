@@ -1,12 +1,15 @@
-#include <esp_now.h>
-#include <WiFi.h>
+#include <espnow.h>
+#include <ESP8266WiFi.h>
 #include <Wire.h> // Einbinden der Wire-Bibliothek für I2C-Kommunikation
 
 const int pcf8575_address = 0x20; // I2C-Adresse des PCF8575
+uint8_t receiverMac[] = {0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC};
 
 typedef struct {
   unsigned long onTimes[16];  // Array von Zeiten für jedes Relais
 } RelayControl;
+
+RelayControl relayControl; // Instanz von RelayControl für die Speicherung der empfangenen Daten
 
 // Struktur, um den Zustand und die Zeitsteuerung für jedes Relais zu speichern
 typedef struct {
@@ -34,8 +37,8 @@ void setRelayState(int relayNumber, bool state) {
   pcf8575Write(relayBitmask);
 }
 
-void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
-  memcpy(&relayControl, incomingData, sizeof(relayControl));
+void OnDataRecv(uint8_t *mac, uint8_t *data, uint8_t len) {
+  memcpy(&relayControl, data, sizeof(relayControl));
   for (int i = 0; i < 16; i++) {
     if (relayControl.onTimes[i] > 0) {
       relayStates[i].isOn = true;
@@ -47,14 +50,14 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
 }
 
 void setup() {
+  Wire.begin(); // Starten der I2C-Kommunikation
   WiFi.mode(WIFI_STA);
-  if (esp_now_init() != ESP_OK) {
+  if (esp_now_init() != 0) {
     return;
   }
-  Wire.begin(); // Starten der I2C-Kommunikation
-
+  // Register callback function for received data
   esp_now_register_recv_cb(OnDataRecv);
-
+  
   // Alle Relais ausschalten zu Beginn
   relayBitmask = 0;
   pcf8575Write(relayBitmask);
