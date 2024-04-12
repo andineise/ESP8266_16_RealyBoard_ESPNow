@@ -1,3 +1,4 @@
+//eigene MAC Adresse: 08:f9:e0:73:35:96
 #include <espnow.h>
 #include <ESP8266WiFi.h>
 #include <Wire.h> // Einbinden der Wire-Bibliothek für I2C-Kommunikation
