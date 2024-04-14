@@ -1,10 +1,12 @@
 //eigene MAC Adresse: 08:f9:e0:73:35:96
+//Display MAC Adresse: 84:FC:E6:74:0C:E0
+#include <Arduino.h>
 #include <espnow.h>
 #include <ESP8266WiFi.h>
 #include <Wire.h> // Einbinden der Wire-Bibliothek für I2C-Kommunikation
 
 const int pcf8575_address = 0x20; // I2C-Adresse des PCF8575
-uint8_t receiverMac[] = {0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC};
+uint8_t receiverMac[] = {0x84, 0xFC, 0xE6, 0x74, 0x0C, 0xE0};
 
 typedef struct {
   unsigned long onTimes[16];  // Array von Zeiten für jedes Relais
